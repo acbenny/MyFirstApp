@@ -30,6 +30,14 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.acbenny.myfirstapp.MainActivity" />
         </activity>
+        <activity
+            android:name=".SunshineMainActivity"
+            android:label="@string/title_activity_sunshine_main"
+            android:parentActivityName=".MainActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.acbenny.myfirstapp.MainActivity" />
+        </activity>
     </application>
 
 </manifest>
