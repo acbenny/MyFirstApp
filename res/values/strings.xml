@@ -8,6 +8,6 @@
     <string name="title_activity_display_message">DisplayMessageActivity</string>
     <string name="hello_world">Hello world!</string>
     <string name="title_activity_sunshine_main">SunshineMainActivity</string>
-    <string name="date">Date</string>
+    <string name="action_refresh">Refresh</string>
 
 </resources>
