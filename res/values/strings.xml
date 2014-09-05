@@ -9,5 +9,7 @@
     <string name="hello_world">Hello world!</string>
     <string name="title_activity_sunshine_main">SunshineMainActivity</string>
     <string name="action_refresh">Refresh</string>
+    <string name="title_activity_detail">DetailActivity</string>
+    <string name="title_activity_settings">SettingsActivity</string>
 
 </resources>

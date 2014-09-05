@@ -17,6 +17,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.app.Fragment;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -27,6 +28,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
@@ -88,6 +90,17 @@ public class ForecastFragment extends Fragment {
 		ListView listView = (ListView) rootView.findViewById(R.id.listview_forecast);
 		listView.setAdapter(arrAdapterForecast);
 
+		listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+			@Override
+			public void onItemClick(AdapterView<?> adaptorView, View view,
+					int position, long arg3) {
+				String forecast = arrAdapterForecast.getItem(position);
+				Intent intent = new Intent(getActivity(), DetailActivity.class);
+				intent.putExtra(Intent.EXTRA_TEXT, forecast);
+				startActivity(intent);
+			}
+		});
 		return rootView;
 	}
 
@@ -280,9 +293,7 @@ public class ForecastFragment extends Fragment {
 		protected void onPostExecute(String[] result) {
 			if (result != null) {
 				arrAdapterForecast.clear();
-				for (String dayForecast : result) {
-					arrAdapterForecast.add(dayForecast);
-				}
+				arrAdapterForecast.addAll(result);
 			}
 
 			super.onPostExecute(result);
