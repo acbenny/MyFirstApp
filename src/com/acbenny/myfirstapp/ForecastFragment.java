@@ -21,6 +21,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -54,6 +55,15 @@ public class ForecastFragment extends Fragment {
 		inflater.inflate(R.menu.forecast_fragment, menu);
 	}
 
+	private void updateWeather() {
+		FetchWeatherTask weatherTask = new FetchWeatherTask();
+		String location = (PreferenceManager
+				.getDefaultSharedPreferences(getActivity())).getString(
+				getString(R.string.pref_location_key),
+				getString(R.string.pref_location_default));
+		weatherTask.execute(location);
+	}
+
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		// Handle action bar item clicks here. The action bar will
@@ -61,9 +71,10 @@ public class ForecastFragment extends Fragment {
 		// as you specify a parent activity in AndroidManifest.xml.
 		int id = item.getItemId();
 		if (id == R.id.action_refresh) {
-			FetchWeatherTask weatherTask = new FetchWeatherTask();
-			weatherTask.execute("94043");
+			updateWeather();
 			return true;
+		} else if (id == R.id.action_settings) {
+			startActivity(new Intent(getActivity(), SettingsActivity.class));
 		}
 		return super.onOptionsItemSelected(item);
 	}
@@ -102,6 +113,12 @@ public class ForecastFragment extends Fragment {
 			}
 		});
 		return rootView;
+	}
+
+	@Override
+	public void onStart() {
+		updateWeather();
+		super.onStart();
 	}
 
 	public class FetchWeatherTask extends AsyncTask<String, Void, String[]> {
