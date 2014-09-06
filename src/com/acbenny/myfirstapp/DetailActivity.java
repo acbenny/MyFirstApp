@@ -4,11 +4,14 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ShareActionProvider;
 import android.widget.TextView;
 
 public class DetailActivity extends Activity {
@@ -19,7 +22,7 @@ public class DetailActivity extends Activity {
 		setContentView(R.layout.activity_detail);
 		if (savedInstanceState == null) {
 			getFragmentManager().beginTransaction()
-					.add(R.id.container, new PlaceholderFragment()).commit();
+					.add(R.id.container, new DetailFragment()).commit();
 		}
 	}
 
@@ -46,9 +49,30 @@ public class DetailActivity extends Activity {
 	/**
 	 * A placeholder fragment containing a simple view.
 	 */
-	public static class PlaceholderFragment extends Fragment {
+	public static class DetailFragment extends Fragment {
 
-		public PlaceholderFragment() {
+		private static final String LOG_TAG = DetailFragment.class
+				.getSimpleName();
+		private static final String FORECAST_SHARE_HASHTAG = "#SunshineApp";
+		private String mForecastStr;
+
+		public DetailFragment() {
+			setHasOptionsMenu(true);
+		}
+
+		@Override
+		public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+			inflater.inflate(R.menu.detail_fragment, menu);
+			MenuItem shareItem = menu.findItem(R.id.action_share);
+			ShareActionProvider shareProvider = (ShareActionProvider) shareItem
+					.getActionProvider();
+
+			if (shareProvider != null) {
+				shareProvider.setShareIntent(createShareForecastIntent());
+			} else {
+				Log.d(LOG_TAG, "ShareProvider is null");
+			}
+			super.onCreateOptionsMenu(menu, inflater);
 		}
 
 		@Override
@@ -59,11 +83,20 @@ public class DetailActivity extends Activity {
 					container, false);
 
 			if (intent != null && intent.hasExtra(Intent.EXTRA_TEXT)) {
-				String forcastStr = intent.getStringExtra(Intent.EXTRA_TEXT);
+				mForecastStr = intent.getStringExtra(Intent.EXTRA_TEXT);
 				((TextView) rootView.findViewById(R.id.detail_text))
-						.setText(forcastStr);
+						.setText(mForecastStr);
 			}
 			return rootView;
+		}
+
+		private Intent createShareForecastIntent() {
+			Intent shareIntent = new Intent(Intent.ACTION_SEND);
+			shareIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
+			shareIntent.setType("text/plain");
+			shareIntent.putExtra(Intent.EXTRA_TEXT, mForecastStr
+					+ FORECAST_SHARE_HASHTAG);
+			return shareIntent;
 		}
 	}
 }

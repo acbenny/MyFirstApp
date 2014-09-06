@@ -8,7 +8,6 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -32,6 +31,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.Toast;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -72,11 +72,31 @@ public class ForecastFragment extends Fragment {
 		int id = item.getItemId();
 		if (id == R.id.action_refresh) {
 			updateWeather();
+			Toast.makeText(getActivity(), "Refresh Complete",
+					Toast.LENGTH_SHORT).show();
 			return true;
 		} else if (id == R.id.action_settings) {
 			startActivity(new Intent(getActivity(), SettingsActivity.class));
+		} else if (id == R.id.action_map) {
+			openPreferredLocationInMap();
 		}
 		return super.onOptionsItemSelected(item);
+	}
+
+	private void openPreferredLocationInMap() {
+		String location = (PreferenceManager
+				.getDefaultSharedPreferences(getActivity())).getString(
+				getString(R.string.pref_location_key),
+				getString(R.string.pref_location_default));
+		
+		Uri geoLocation = Uri.parse("geo:0,0?").buildUpon().appendQueryParameter("q", location).build();
+		
+		Intent intent = new Intent(Intent.ACTION_VIEW);
+		intent.setData(geoLocation);
+		
+		if (intent.resolveActivity(getActivity().getPackageManager()) != null) {
+			startActivity(intent);
+		}
 	}
 
 	@Override
@@ -84,19 +104,11 @@ public class ForecastFragment extends Fragment {
 			Bundle savedInstanceState) {
 		View rootView = inflater.inflate(R.layout.fragment_sunshine_main,
 				container, false);
-		String[] forecastArray = {
-				"Today - Sunny - 88/63",
-				"Tomorrow - Foggy - 70/40",
-				"Weds - Cloudy - 72/63",
-				"Thurs - Astroids - 75/65",
-				"Fri - Heavy Rain - 65/56",
-				"Sat - Clear - 66/50",
-				"Sun - Sunny - 80/68"
-		};
+		List<String> weekForecast = new ArrayList<String>();
 		
-		List <String> weekForecast = new ArrayList<String> (Arrays.asList(forecastArray));
-		
-		arrAdapterForecast = new ArrayAdapter<String> (getActivity(), R.layout.list_item_forecast, R.id.list_item_forecast_textview, weekForecast);
+		arrAdapterForecast = new ArrayAdapter<String>(getActivity(),
+				R.layout.list_item_forecast, R.id.list_item_forecast_textview,
+				weekForecast);
 		
 		ListView listView = (ListView) rootView.findViewById(R.id.listview_forecast);
 		listView.setAdapter(arrAdapterForecast);
@@ -135,7 +147,7 @@ public class ForecastFragment extends Fragment {
 			String forecastJsonStr = null;
 			String format = "json";
 			String units = "metric";
-			int numDays = 7;
+			int numDays = 14;
 			try {
 				// Construct the URL for the OpenWeatherMap query
 				// Possible parameters are available at OWM's forecast API page,
@@ -235,6 +247,17 @@ public class ForecastFragment extends Fragment {
 		 * Prepare the weather high/lows for presentation.
 		 */
 		private String formatHighLows(double high, double low) {
+
+			String units = (PreferenceManager
+					.getDefaultSharedPreferences(getActivity())).getString(
+					getString(R.string.pref_temp_format_key),
+					getString(R.string.pref_temp_format_default));
+			if (units.equals("imperial")) {
+				high = (high * 1.8) + 32;
+				low = (low * 1.8) + 32;
+			} else if (!units.equals("metric")) {
+				Log.d(LOG_TAG, "Unit type unrecognized:" + units);
+			}
 			// For presentation, assume the user doesn't care about tenths of a
 			// degree.
 			long roundedHigh = Math.round(high);

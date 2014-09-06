@@ -26,6 +26,7 @@ public class SettingsActivity extends PreferenceActivity implements
 		// summary can be
 		// updated when the preference changes.
 		bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_location_key)));
+		bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_temp_format_key)));
 	}
 
 	/**
